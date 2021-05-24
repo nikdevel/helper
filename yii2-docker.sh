@@ -14,6 +14,11 @@ apt install docker-ce --no-install-recommends
 
 git clone https://github.com/yiisoft/yii2-docker.git yii2-docker
 cd yii2-docker
+
+cp .env-dist .env
+docker-compose build
+
+
 docker-compose up -d
 
 docker-compose run --rm php php /tests/requirements.php
