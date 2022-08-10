@@ -1,36 +1,23 @@
 #!/bin/bash
 
-# Remove old versions of Docker
-sudo apt-get remove docker docker-engine docker.io containerd runc
+set -e
 
+# Add Docker repo
 sudo apt-get update
-
 sudo apt-get install \
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg \
-    lsb-release --no-install-recommends 
+	ca-certificates \
+	curl \
+	gnupg \
+	lsb-release \
+	-y
 
-# Add official docker repo
-
-curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/`sed -n 's/^ID=\(.*\)$/\1/p' /etc/os-release`/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
 echo \
-  "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
-  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
+	"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/`sed -n 's/^ID=\(.*\)$/\1/p' /etc/os-release` \
+	$(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+	
+# Installation
 sudo apt-get update
-
-# Install Docker
-sudo apt-get install docker-ce docker-ce-cli containerd.io --no-install-recommends
-
-# Install docker-compose
-
-sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-
-sudo chmod +x /usr/local/bin/docker-compose
-
-# Run docker hello-world
-
-sudo docker run hello-world
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
